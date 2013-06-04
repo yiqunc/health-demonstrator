@@ -75,20 +75,13 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'slider',
 										id : 'slider11',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
 										value : 50,
 										increment : 1,
 										minValue : 0,
 										maxValue : 10,
 										anchor : '100%',
-										listeners : {
-											change : function(select, thumb,
-													newval, oldval) {
-												Ext.getCmp("slider_value11")
-														.setValue(thumb);
-											}
-										},
 										colspan : 4
 									},
 									{
@@ -146,25 +139,18 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										readOnly : true,
 										width : 40,
 										colspan : 1,
-										value : 5
+										value : 4
 									},
 									{
 										xtype : 'slider',
 										id : 'slider12',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
-										value : 50,
+										value : 15,
 										increment : 1,
 										minValue : 0,
-										maxValue : 100,
-										listeners : {
-											change : function(select, thumb,
-													newval, oldval) {
-												Ext.getCmp("slider_value12")
-														.setValue(thumb);
-											}
-										},
+										maxValue : 15,
 										colspan : 4
 									},
 									{
@@ -229,19 +215,12 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'slider',
 										id : 'slider13',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
 										value : 50,
 										increment : 1,
 										minValue : 0,
-										maxValue : 100,
-										listeners : {
-											change : function(select, thumb,
-													newval, oldval) {
-												Ext.getCmp("slider_value13")
-														.setValue(thumb);
-											}
-										},
+										maxValue : 100,						
 										colspan : 4
 									},
 									{
@@ -308,20 +287,13 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'slider',
 										id : 'slider14',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
 										value : 50,
 										increment : 1,
 										minValue : 0,
 										maxValue : 100,
 										disabled : true,
-										listeners : {
-											change : function(select, thumb,
-													newval, oldval) {
-												Ext.getCmp("slider_value14")
-														.setValue(thumb);
-											}
-										},
 										colspan : 4
 									},
 									{
@@ -388,20 +360,13 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'slider',
 										id : 'slider15',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
 										value : 50,
 										increment : 1,
 										minValue : 0,
 										maxValue : 100,
 										disabled : true,
-										listeners : {
-											change : function(select, thumb,
-													newval, oldval) {
-												Ext.getCmp("slider_value15")
-														.setValue(thumb);
-											}
-										},
 										colspan : 4
 									}, {
 										xtype : 'label',
@@ -497,7 +462,7 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'slider',
 										id : 'slider21',
 										hideLabel : true,
-										useTips : true,
+										useTips : false,
 										width : 214,
 										value : 100,
 										increment : 100,
@@ -739,50 +704,115 @@ org.aurin.demonstratortools.health.mainUI = function() {
 									&& data.responseText != undefined) {
 								var _responseObj = Ext
 										.decode(data.responseText);
+								/*for SEIFA_METRIC slider*/
 								Ext
 										.getCmp('slider11')
 										.setMaxValue(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC]);
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_INTERVAL]);
+								Ext
+										.getCmp('slider11')
+										.setValue(
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_INTERVAL]);
+								Ext
+										.getCmp('slider11')
+										.addListener('change', function(select, thumb, newval, oldval) {
+											Ext 
+												.getCmp("slider_value11") 
+												.setValue(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MIN]+thumb/1);
+										});
+								
 								Ext
 										.getCmp('slider_maxvalue11')
 										.setText(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC]);
-
+												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MAX]);
+								
+								/*for TYPE2_DIABETES slider*/
 								Ext
 										.getCmp('slider12')
 										.setMaxValue(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES]);
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_INTERVAL]);
+								Ext
+										.getCmp('slider12')
+										.setValue(
+										(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_INTERVAL]);
+	
+								Ext
+										.getCmp('slider12')
+										.addListener('change', function(select, thumb, newval, oldval) {
+											Ext 
+											.getCmp("slider_value12") 
+											.setValue(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MIN]+thumb/10.0);
+										});
+								
 								Ext
 										.getCmp('slider_maxvalue12')
 										.setText(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES]);
-
+												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MAX]);
+								
+								/*for Depression slider*/
 								Ext
 										.getCmp('slider13')
 										.setMaxValue(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION]);
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_INTERVAL]);
+								Ext
+										.getCmp('slider13')
+										.setValue(
+										(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_INTERVAL]);
+								
+								Ext
+										.getCmp('slider13')
+										.addListener('change', function(select, thumb, newval, oldval) {
+											Ext 
+											.getCmp("slider_value13") 
+											.setValue(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MIN]+thumb/10.0);
+										});
+								
 								Ext
 										.getCmp('slider_maxvalue13')
 										.setText(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION]);
+												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MAX]);
 
+								/*for OBESITY slider*/
 								Ext
 										.getCmp('slider14')
 										.setMaxValue(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY]);
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_INTERVAL]);
+								Ext
+										.getCmp('slider14')
+										.setValue(
+										(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_INTERVAL]);
+		
+								Ext
+										.getCmp('slider14')
+										.addListener('change', function(select, thumb, newval, oldval) {
+											Ext 
+											.getCmp("slider_value14") 
+											.setValue(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MIN]+thumb/10.0);
+										});
 								Ext
 										.getCmp('slider_maxvalue14')
 										.setText(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY]);
-
+												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MAX]);
+								/*for SMOKING slider*/
 								Ext
 										.getCmp('slider15')
 										.setMaxValue(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING]);
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_INTERVAL]);
+								Ext
+										.getCmp('slider15')
+										.setValue(
+												(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MAX]-_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MIN])/_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_INTERVAL]);
+								Ext
+										.getCmp('slider15')
+										.addListener('change', function(select, thumb, newval, oldval) {
+											Ext 
+											.getCmp("slider_value15") 
+											.setValue(_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MIN]+thumb/10.0);
+										});
 								Ext
 										.getCmp('slider_maxvalue15')
 										.setText(
-												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING]);
+												_responseObj[org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MAX]);
 
 								Ext
 										.getCmp('slider21')

@@ -19,26 +19,44 @@ window['map_init'] = function() {
 	
 	var mercator = new OpenLayers.Projection("EPSG:900913");
 	var saveStrategy = new OpenLayers.Strategy.Save();
-
+	var styles = new OpenLayers.StyleMap({
+		"default" : new OpenLayers.Style(null, {
+			rules : [ new OpenLayers.Rule({
+				symbolizer : {
+					"Point" : {
+						pointRadius : 5,
+						graphicName : "square",
+						fillColor : "white",
+						fillOpacity : 0.25,
+						strokeWidth : 1,
+						strokeOpacity : 1,
+						strokeColor : "#333333"
+					},
+					"Line" : {
+						strokeWidth : 3,
+						strokeOpacity : 1,
+						strokeColor : "#666666"
+					},
+					"Polygon" : {
+						strokeWidth : 1,
+						strokeOpacity : 1,
+						strokeColor : "#000000",
+						fillColor : "#1E90FF",
+						fillOpacity : 0.5
+					}
+				}
+			}) ]
+		})
+	});
+	
 	lyr_results = new OpenLayers.Layer.Vector("Results", {
 		projection : mercator,
 		strategies : [ new OpenLayers.Strategy.Fixed() ],
-
+		styleMap : styles,
 		protocol : new OpenLayers.Protocol.HTTP({
 			url : "/health-demonstrator/service/health-filter/filterResult",
 			format : new OpenLayers.Format.GeoJSON()
 		}),
-		// styleMap : new OpenLayers.StyleMap({
-		// "default" : pathStyle
-		// "default" : new OpenLayers.Style({
-		// graphicName : "circle",
-		// pointRadius : 10,
-		// fillOpacity : 0.5,
-		// fillColor : "#9e69e3",
-		// strokeColor : "#8e45ed",
-		// strokeWidth : 1
-		// })
-		// }),
 		renderers : [ "Canvas", "SVG", "VML" ]
 	});
 
@@ -54,13 +72,15 @@ window['map_init'] = function() {
 			}, {
 				buffer : 0,
 				displayOutsideMaxExtent : true,
+				projection : mercator,
 				reproject : true
 			});
 	lyr_SEIFA.setIsBaseLayer(false);
 	lyr_SEIFA.setVisibility(false);
+	lyr_SEIFA.setOpacity(0.5);
+
 	
-	
-	//define GPs layers 		srsName : "EPSG:900913",
+	//define GPs layers
 	lyr_GP = new OpenLayers.Layer.WMS("GP",
 			"/health-demonstrator/geoserver/wms", {
 				LAYERS : 'CSDILA_local:gps_inwmml',
@@ -72,12 +92,89 @@ window['map_init'] = function() {
 			}, {
 				buffer : 0,
 				displayOutsideMaxExtent : true,
+				projection : mercator,
 				reproject : true
 			});
 	lyr_GP.setIsBaseLayer(false);
 	lyr_GP.setVisibility(false);
+	lyr_GP.setOpacity(0.5);
+
+	//define Diabetes layers
+	lyr_Diabetes = new OpenLayers.Layer.WMS("Type 2 Diabetes",
+			"/health-demonstrator/geoserver/wms", {
+				LAYERS : 'CSDILA_local:type_2_diabetes',
+				STYLES : '',
+				format : 'image/png',
+				tiled : true,
+				transparent : true,
+				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+			}, {
+				buffer : 0,
+				displayOutsideMaxExtent : true,
+				projection : mercator,
+				reproject : true
+			});
+	lyr_Diabetes.setIsBaseLayer(false);
+	lyr_Diabetes.setVisibility(false);
+	lyr_Diabetes.setOpacity(0.5);
+
+	//define Depression layers
+	lyr_Depression = new OpenLayers.Layer.WMS("Depression",
+			"/health-demonstrator/geoserver/wms", {
+				LAYERS : 'CSDILA_local:mood_problems',
+				STYLES : '',
+				format : 'image/png',
+				tiled : true,
+				transparent : true,
+				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+			}, {
+				buffer : 0,
+				displayOutsideMaxExtent : true,
+				projection : mercator,
+				reproject : true
+			});
+	lyr_Depression.setIsBaseLayer(false);
+	lyr_Depression.setVisibility(false);
+	lyr_Depression.setOpacity(0.5);
 	
+	//define Obesity layers
+	lyr_Obesity = new OpenLayers.Layer.WMS("Obesity",
+			"/health-demonstrator/geoserver/wms", {
+				LAYERS : 'CSDILA_local:obesity',
+				STYLES : '',
+				format : 'image/png',
+				tiled : true,
+				transparent : true,
+				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+			}, {
+				buffer : 0,
+				displayOutsideMaxExtent : true,
+				projection : mercator,
+				reproject : true
+			});
+	lyr_Obesity.setIsBaseLayer(false);
+	lyr_Obesity.setVisibility(false);
+	lyr_Obesity.setOpacity(0.5);
 	
+	//define Smoking layers
+	lyr_Smoking = new OpenLayers.Layer.WMS("Smoking",
+			"/health-demonstrator/geoserver/wms", {
+				LAYERS : 'CSDILA_local:smoking',
+				STYLES : '',
+				format : 'image/png',
+				tiled : true,
+				transparent : true,
+				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+			}, {
+				buffer : 0,
+				displayOutsideMaxExtent : true,
+				projection : mercator,
+				reproject : true
+			});
+	lyr_Smoking.setIsBaseLayer(false);
+	lyr_Smoking.setVisibility(false);
+	lyr_Smoking.setOpacity(0.5);
+	/*
 	wfs = new OpenLayers.Layer.Vector(
 			"gp-wfs",
 			{
@@ -94,8 +191,8 @@ window['map_init'] = function() {
 							schema : "/health-demonstrator/geoserver/wfs/DescribeFeatureType?version=1.1.0&typename=CSDILA_local:gps_inwmml"
 						})
 			});
-
-	map.addLayers([osm,lyr_results, lyr_SEIFA, lyr_GP, wfs]);
+	*/
+	map.addLayers([osm, lyr_results, lyr_SEIFA, lyr_Diabetes, lyr_Depression, lyr_Obesity, lyr_Smoking, lyr_GP]);
 
 	map.setCenter(new OpenLayers.LonLat(16133371, -4544265), 12);
 

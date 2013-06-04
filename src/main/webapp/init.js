@@ -27,10 +27,30 @@ org.aurin.demonstratortools.health.init = function() {
 	org.aurin.demonstratortools.health.constants.UIOutputModel.METRIC_VALUE = "METRIC_VALUE";
 
 	org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC = "SEIFA_METRIC";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MIN = "SEIFA_METRIC_MIN";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_MAX = "SEIFA_METRIC_MAX";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SEIFA_METRIC_INTERVAL = "SEIFA_METRIC_INTERVAL";
+	
 	org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES = "TYPE2_DIABETES";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MIN = "TYPE2_DIABETES_MIN";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_MAX = "TYPE2_DIABETES_MAX";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.TYPE2_DIABETES_INTERVAL = "TYPE2_DIABETES_INTERVAL";
+	
 	org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION = "DEPRESSION";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MIN = "DEPRESSION_MIN";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_MAX = "DEPRESSION_MAX";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.DEPRESSION_INTERVAL = "DEPRESSION_INTERVAL";
+	
 	org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY = "OBESITY";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MIN = "OBESITY_MIN";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_MAX = "OBESITY_MAX";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.OBESITY_INTERVAL = "OBESITY_INTERVAL";
+	
 	org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING = "SMOKING";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MIN = "SMOKING_MIN";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_MAX = "SMOKING_MAX";
+	org.aurin.demonstratortools.health.constants.UIOutputModel.SMOKING_INTERVAL = "SMOKING_INTERVAL";
+	
 	org.aurin.demonstratortools.health.constants.UIOutputModel.NO_ACCESS_TO_GENERAL_PRACTICE = "NO_ACCESS_TO_GENERAL_PRACTICE";
 	org.aurin.demonstratortools.health.constants.UIOutputModel.BULK_BILLING_AND_FEE_BASED_SERVICE = "BULK_BILLING_AND_FEE_BASED_SERVICE";
 	org.aurin.demonstratortools.health.constants.UIOutputModel.BULK_BILLING_ONLY = "BULK_BILLING_ONLY";
