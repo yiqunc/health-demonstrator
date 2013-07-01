@@ -41,13 +41,13 @@ public class LayerMapping {
 		shapeFileLocationMap.put(SMOKING_Layer, "datasets/"
 				+ "Smoking_vicgrid.shp");
 		shapeFileLocationMap.put(GENERAL_PRACTICE_Layer, "datasets/"
-				+ "GPs_INWMML.shp");
+				+ "GPs_INWMML_WITH_OPEN_CLOSE_TIME.shp");
 		shapeFileLocationMap.put(COMMUNITY_HEALTH_CENTRE_Layer, "datasets/"
 				+ "CommHealthCentres_ML.shp");
 		shapeFileLocationMap.put(MENTAL_HEALTH_SERVICE_PROVIDER_Layer,
 				"datasets/" + "MentalHealth.shp");
 		shapeFileLocationMap.put(GP_Buffers_100m, "datasets/DistFromGPs/"
-				+ "100m.shp");
+				+ "100m_WITH_OPEN_CLOSE_TIME.shp");
 		shapeFileLocationMap.put(GP_Buffers_200m, "datasets/DistFromGPs/"
 				+ "200m.shp");
 		shapeFileLocationMap.put(GP_Buffers_300m, "datasets/DistFromGPs/"

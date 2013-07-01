@@ -178,24 +178,58 @@ public class HealthFilter {
 			filters.add(ff.equal(ff.property("FreeProvis"),
 					ff.literal("Fee only")));
 		}
+		
 		Boolean AFTER_5_UP_UNTIL_8_PM_ON_WEEKDAYS = ((Boolean) (JsonPath
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'AFTER_5_UP_UNTIL_8_PM_ON_WEEKDAYS')].METRIC_INCLUSION[0]")));
 		if (AFTER_5_UP_UNTIL_8_PM_ON_WEEKDAYS) {
-			filters.add(ff.equal(ff.property("FreeProvis"),
-					ff.literal("Fee only")));
+			// from Monday to Friday, if any weekday the GP still open from 5pm to 8pm, return true;
+			
+			List<Filter> weekdayfilter = new ArrayList<Filter>();
+			
+			weekdayfilter.add(ff.and(ff.greater(ff.property("Mo_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Mo_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property("Tu_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Tu_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property("We_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("We_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property("Th_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Th_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property("Fr_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Fr_CL"), ff.literal("2000"))));
+				
+			filters.add(ff.or(weekdayfilter));
+
 		}
-		// Boolean AFTER_8_PM_ON_WEEKDAYS = ((Boolean) (JsonPath
-		// .read(queryJSON,
-		// "$[?(@['METRIC_NAME'] == 'AFTER_8_PM_ON_WEEKDAYS')].METRIC_INCLUSION[0]")));
-		// Boolean ANY_SATURDAY_SERVICE_AFTER_12_NOON = ((Boolean) (JsonPath
-		// .read(queryJSON,
-		// "$[?(@['METRIC_NAME'] == 'ANY_SATURDAY_SERVICE_AFTER_12_NOON')].METRIC_INCLUSION[0]")));
+		
+		Boolean AFTER_8_PM_ON_WEEKDAYS = ((Boolean) (JsonPath.read(queryJSON,
+		 "$[?(@['METRIC_NAME'] == 'AFTER_8_PM_ON_WEEKDAYS')].METRIC_INCLUSION[0]")));
+		if (AFTER_8_PM_ON_WEEKDAYS) {
+				// from Monday to Friday, if any weekday the GP open after 8pm, return true;
+				
+				List<Filter> weekdayfilter = new ArrayList<Filter>();
+			
+				
+				weekdayfilter.add(ff.and(ff.greater(ff.property("Mo_CL"), ff.literal("2000")), ff.notEqual(ff.property("Mo_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property("Tu_CL"), ff.literal("2000")), ff.notEqual(ff.property("Tu_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property("We_CL"), ff.literal("2000")), ff.notEqual(ff.property("We_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property("Th_CL"), ff.literal("2000")), ff.notEqual(ff.property("Th_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property("Fr_CL"), ff.literal("2000")), ff.notEqual(ff.property("Fr_CL"), ff.literal("NULL"))));
+
+				filters.add(ff.or(weekdayfilter));
+			}
+		 
+		Boolean ANY_SATURDAY_SERVICE_AFTER_12_NOON = ((Boolean) (JsonPath.read(queryJSON,
+		 "$[?(@['METRIC_NAME'] == 'ANY_SATURDAY_SERVICE_AFTER_12_NOON')].METRIC_INCLUSION[0]")));
+		if (ANY_SATURDAY_SERVICE_AFTER_12_NOON) {
+				filters.add(ff.and(ff.greater(ff.property("Sa_CL"), ff.literal("1200")), ff.notEqual(ff.property("Sa_CL"), ff.literal("NULL"))));
+			}
+		
 		Boolean ANY_SUNDAY_SERVICE = ((Boolean) (JsonPath
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'ANY_SUNDAY_SERVICE')].METRIC_INCLUSION[0]")));
 		if (ANY_SUNDAY_SERVICE) {
-			filters.add(ff.notEqual(ff.property("Sunday"), ff.literal("None")));
+			//filters.add(ff.notEqual(ff.property("Sunday"), ff.literal("None")));
+			
+			filters.add(ff.and(ff.notEqual(ff.property("Sunday"), ff.literal("None")),
+							   ff.notEqual(ff.property("Sunday"), ff.literal("NULL"))));
+			
+			
 		}
 		// Boolean COMMUNITY_HEALTH_CENTRE = ((Boolean) (JsonPath
 		// .read(queryJSON,
