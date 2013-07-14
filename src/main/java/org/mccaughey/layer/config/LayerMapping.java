@@ -29,51 +29,59 @@ public class LayerMapping {
 	private static Map<String, String> shapeFileLocationMap;
 	static {
 		shapeFileLocationMap = new HashMap<String, String>();
-		shapeFileLocationMap
-				.put(SEIFA_Layer, "datasets/" + "SEIFA_vicgrid.shp");
-		// shapeFileLocationMap.put(SEIFA_Layer, "datasets/"+"SEIFA.shp");
-		shapeFileLocationMap.put(TYPE2_DIABETES_Layer, "datasets/"
-				+ "Type_2_Diabetes_vicgrid.shp");
-		shapeFileLocationMap.put(DEPRESSION_Layer, "datasets/"
-				+ "Mood_Problems_vicgrid.shp");
-		shapeFileLocationMap.put(OBESITY_Layer, "datasets/"
-				+ "Obesity_vicgrid.shp");
-		shapeFileLocationMap.put(SMOKING_Layer, "datasets/"
-				+ "Smoking_vicgrid.shp");
-		shapeFileLocationMap.put(GENERAL_PRACTICE_Layer, "datasets/"
-				+ "GPs_INWMML_WITH_OPEN_CLOSE_TIME.shp");
-		shapeFileLocationMap.put(COMMUNITY_HEALTH_CENTRE_Layer, "datasets/"
-				+ "CommHealthCentres_ML.shp");
-		shapeFileLocationMap.put(MENTAL_HEALTH_SERVICE_PROVIDER_Layer,
-				"datasets/" + "MentalHealth.shp");
-		shapeFileLocationMap.put(GP_Buffers_100m, "datasets/DistFromGPs/"
-				+ "100m_WITH_OPEN_CLOSE_TIME.shp");
-		shapeFileLocationMap.put(GP_Buffers_200m, "datasets/DistFromGPs/"
-				+ "200m.shp");
-		shapeFileLocationMap.put(GP_Buffers_300m, "datasets/DistFromGPs/"
-				+ "300m.shp");
-		shapeFileLocationMap.put(GP_Buffers_400m, "datasets/DistFromGPs/"
-				+ "400m.shp");
-		shapeFileLocationMap.put(GP_Buffers_500m, "datasets/DistFromGPs/"
-				+ "500m.shp");
-		shapeFileLocationMap.put(GP_Buffers_600m, "datasets/DistFromGPs/"
-				+ "600m.shp");
-		shapeFileLocationMap.put(GP_Buffers_700m, "datasets/DistFromGPs/"
-				+ "700m.shp");
-		shapeFileLocationMap.put(GP_Buffers_800m, "datasets/DistFromGPs/"
-				+ "800m.shp");
-		shapeFileLocationMap.put(GP_Buffers_900m, "datasets/DistFromGPs/"
-				+ "900m.shp");
-		shapeFileLocationMap.put(GP_Buffers_1000m, "datasets/DistFromGPs/"
-				+ "1000m.shp");
-		shapeFileLocationMap.put(GP_Buffers_1100m, "datasets/DistFromGPs/"
-				+ "1100m.shp");
-		shapeFileLocationMap.put(GP_Buffers_1200m, "datasets/DistFromGPs/"
-				+ "1200m.shp");
+		shapeFileLocationMap.put(SEIFA_Layer, "datasets/" + "SEIFA_vicgrid.shp");
+		shapeFileLocationMap.put(TYPE2_DIABETES_Layer, "datasets/"+ "Type_2_Diabetes_vicgrid.shp");
+		shapeFileLocationMap.put(DEPRESSION_Layer, "datasets/"+ "Mood_Problems_vicgrid.shp");
+		shapeFileLocationMap.put(OBESITY_Layer, "datasets/"+ "Obesity_vicgrid.shp");
+		shapeFileLocationMap.put(SMOKING_Layer, "datasets/"+ "Smoking_vicgrid.shp");
+		shapeFileLocationMap.put(GENERAL_PRACTICE_Layer, "datasets/"+ "GPs_INWMML.shp");
+		shapeFileLocationMap.put(COMMUNITY_HEALTH_CENTRE_Layer, "datasets/"+ "CommHealthCentres_ML.shp");
+		shapeFileLocationMap.put(MENTAL_HEALTH_SERVICE_PROVIDER_Layer,"datasets/" + "MentalHealth.shp");
+		shapeFileLocationMap.put(GP_Buffers_100m, "datasets/DistFromGPs/"+ "100m.shp");
+		shapeFileLocationMap.put(GP_Buffers_200m, "datasets/DistFromGPs/"+ "200m.shp");
+		shapeFileLocationMap.put(GP_Buffers_300m, "datasets/DistFromGPs/"+ "300m.shp");
+		shapeFileLocationMap.put(GP_Buffers_400m, "datasets/DistFromGPs/"+ "400m.shp");
+		shapeFileLocationMap.put(GP_Buffers_500m, "datasets/DistFromGPs/"+ "500m.shp");
+		shapeFileLocationMap.put(GP_Buffers_600m, "datasets/DistFromGPs/"+ "600m.shp");
+		shapeFileLocationMap.put(GP_Buffers_700m, "datasets/DistFromGPs/"+ "700m.shp");
+		shapeFileLocationMap.put(GP_Buffers_800m, "datasets/DistFromGPs/"+ "800m.shp");
+		shapeFileLocationMap.put(GP_Buffers_900m, "datasets/DistFromGPs/"+ "900m.shp");
+		shapeFileLocationMap.put(GP_Buffers_1000m, "datasets/DistFromGPs/"+ "1000m.shp");
+		shapeFileLocationMap.put(GP_Buffers_1100m, "datasets/DistFromGPs/"+ "1100m.shp");
+		shapeFileLocationMap.put(GP_Buffers_1200m, "datasets/DistFromGPs/"+ "1200m.shp");
+	}
+	
+	private static Map<String, String> shapeFileLocationMapForNWMML;
+	static {
+		shapeFileLocationMapForNWMML = new HashMap<String, String>();
+		shapeFileLocationMapForNWMML.put(SEIFA_Layer, "NWMML_datasets/" + "NWMML_SEIFA2011.shp");
+		shapeFileLocationMapForNWMML.put(TYPE2_DIABETES_Layer, "NWMML_datasets/"+ "NWMML_Type2Diabetes.shp");
+		shapeFileLocationMapForNWMML.put(DEPRESSION_Layer, "NWMML_datasets/"+ "NWMML_MoodProblems.shp");
+		shapeFileLocationMapForNWMML.put(OBESITY_Layer, "NWMML_datasets/"+ "NWMML_Obesity.shp");
+		shapeFileLocationMapForNWMML.put(SMOKING_Layer, "NWMML_datasets/"+ "NWMML_Smoking.shp");
+		shapeFileLocationMapForNWMML.put(GENERAL_PRACTICE_Layer, "NWMML_datasets/"+ "NWMML_GPs.shp");
+		//shapeFileLocationMapForNWMML.put(COMMUNITY_HEALTH_CENTRE_Layer, "NWMML_datasets/"+ "CommHealthCentres_ML.shp");
+		//shapeFileLocationMapForNWMML.put(MENTAL_HEALTH_SERVICE_PROVIDER_Layer,"NWMML_datasets/" + "MentalHealth.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_100m, "NWMML_datasets/DistFromGPs/"+ "100m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_200m, "NWMML_datasets/DistFromGPs/"+ "200m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_300m, "NWMML_datasets/DistFromGPs/"+ "300m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_400m, "NWMML_datasets/DistFromGPs/"+ "400m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_500m, "NWMML_datasets/DistFromGPs/"+ "500m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_600m, "NWMML_datasets/DistFromGPs/"+ "600m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_700m, "NWMML_datasets/DistFromGPs/"+ "700m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_800m, "NWMML_datasets/DistFromGPs/"+ "800m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_900m, "NWMML_datasets/DistFromGPs/"+ "900m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_1000m, "NWMML_datasets/DistFromGPs/"+ "1000m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_1100m, "NWMML_datasets/DistFromGPs/"+ "1100m.shp");
+		shapeFileLocationMapForNWMML.put(GP_Buffers_1200m, "NWMML_datasets/DistFromGPs/"+ "1200m.shp");
 	}
 
 	public static String getPath(String layerName) {
-		return shapeFileLocationMap.get(layerName);
+		//for Inner Melb Area
+		//return shapeFileLocationMap.get(layerName);
+		
+		//for Northern and Western Metropolitan Melb Area
+		return shapeFileLocationMapForNWMML.get(layerName);
 	}
 
 }

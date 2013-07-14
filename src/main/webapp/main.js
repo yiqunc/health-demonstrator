@@ -416,16 +416,13 @@ org.aurin.demonstratortools.health.mainUI = function() {
 											change : {
 												fn : function(checkbox, checked) {
 													Ext.getCmp('combo21')
-															.setDisabled(
-																	!checked);
+															//.setDisabled(!checked);
+															.setDisabled(true);
 													Ext.getCmp('slider21')
-															.setDisabled(
-																	!checked);
+															.setDisabled(!checked);
 													Ext
-															.getCmp(
-																	'slider_value21')
-															.setDisabled(
-																	!checked);
+															.getCmp('slider_value21')
+															.setDisabled(!checked);
 
 												},
 											}
@@ -447,6 +444,7 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										store : org.aurin.demonstratortools.health.model.operator_store,
 										width : 40,
 										disabled : true,
+										hidden : true,
 										colspan : 1
 									},
 									{
@@ -607,7 +605,9 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										boxLabel : 'Community Health Centre',
 										fieldLabel : 'text',
 										colspan : 7,
-										checked : false
+										checked : false,
+										hidden : false,
+										disabled: true
 
 									},
 									{
@@ -624,7 +624,9 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										boxLabel : 'Mental Health Service Provider',
 										fieldLabel : 'text',
 										colspan : 7,
-										checked : false
+										checked : false,
+										hidden : false,
+										disabled: true
 
 									} ]
 						})

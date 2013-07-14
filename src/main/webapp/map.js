@@ -63,7 +63,7 @@ window['map_init'] = function() {
 	// define SEIFA layers
 	lyr_SEIFA = new OpenLayers.Layer.WMS("SEIFA",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:seifa',
+				LAYERS : 'CSDILA_local:nwmm_seifa2011',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,
@@ -83,7 +83,7 @@ window['map_init'] = function() {
 	//define GPs layers
 	lyr_GP = new OpenLayers.Layer.WMS("GP",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:gps_inwmml',
+				LAYERS : 'CSDILA_local:nwmm_gps',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,
@@ -102,7 +102,7 @@ window['map_init'] = function() {
 	//define Diabetes layers
 	lyr_Diabetes = new OpenLayers.Layer.WMS("Type 2 Diabetes",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:type_2_diabetes',
+				LAYERS : 'CSDILA_local:nwmm_type2diabetes',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,
@@ -121,7 +121,7 @@ window['map_init'] = function() {
 	//define Depression layers
 	lyr_Depression = new OpenLayers.Layer.WMS("Depression",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:mood_problems',
+				LAYERS : 'CSDILA_local:nwmm_moodproblems',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,
@@ -140,7 +140,7 @@ window['map_init'] = function() {
 	//define Obesity layers
 	lyr_Obesity = new OpenLayers.Layer.WMS("Obesity",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:obesity',
+				LAYERS : 'CSDILA_local:nwmm_obesity',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,
@@ -159,7 +159,7 @@ window['map_init'] = function() {
 	//define Smoking layers
 	lyr_Smoking = new OpenLayers.Layer.WMS("Smoking",
 			"/health-demonstrator/geoserver/wms", {
-				LAYERS : 'CSDILA_local:smoking',
+				LAYERS : 'CSDILA_local:nwmm_smoking',
 				STYLES : '',
 				format : 'image/png',
 				tiled : true,

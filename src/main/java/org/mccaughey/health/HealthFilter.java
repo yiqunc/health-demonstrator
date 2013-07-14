@@ -21,6 +21,9 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.NilExpression;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +104,7 @@ public class HealthFilter {
 			String obesityOp = JsonPath.read(queryJSON,
 					"[?(@['METRIC_NAME'] == 'OBESITY')].OPERATOR[0]");
 			SimpleFeatureCollection obesityFeatures = getAttributeFiltered_FeatureCollection(
-					obesitySource, obesityOp, obesityValue, "ObesePeopl");
+					obesitySource, obesityOp, obesityValue, "Obese18_AS"); //ObesePeopl
 			layers.add(obesityFeatures);
 		}
 		Boolean SMOKING = ((Boolean) (JsonPath.read(queryJSON,
@@ -112,7 +115,7 @@ public class HealthFilter {
 			String smokingOp = JsonPath.read(queryJSON,
 					"[?(@['METRIC_NAME'] == 'SMOKING')].OPERATOR[0]");
 			SimpleFeatureCollection smokingFeatures = getAttributeFiltered_FeatureCollection(
-					smokingSource, smokingOp, smokingValue, "SmokePop");
+					smokingSource, smokingOp, smokingValue, "Smoke18_AS"); //SmokePop
 			layers.add(smokingFeatures);
 		}
 		Boolean NO_ACCESS_TO_GENERAL_PRACTICE = ((Boolean) (JsonPath
@@ -161,22 +164,26 @@ public class HealthFilter {
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'BULK_BILLING_AND_FEE_BASED_SERVICE')].METRIC_INCLUSION[0]")));
 		if (BULK_BILLING_AND_FEE_BASED_SERVICE) {
-			filters.add(ff.notEqual(ff.property("FreeProvis"),
-					ff.literal("Other")));
-
+			//FreeProvis
+			//Exclude records whose Fee_Servic is NULL, isNull doesn't function properly here
+			filters.add(ff.and(ff.greater(ff.property("Fee_Servic"),ff.literal("")), ff.notEqual(ff.property("Fee_Servic"),ff.literal("Other"))));
 		}
+		
+		//attention: use ff.equals NOT ff.equal
 		Boolean BULK_BILLING_ONLY = ((Boolean) (JsonPath
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'BULK_BILLING_ONLY')].METRIC_INCLUSION[0]")));
 		if (BULK_BILLING_ONLY) {
-			filters.add(ff.equal(ff.property("FreeProvis"),
-					ff.literal("\"Bulkbilling only\"")));
+			filters.add(ff.equals(ff.property("Fee_Servic"), ff.literal("Bulkbilling only")));
+			
 		}
+		
 		Boolean FEE_ONLY = ((Boolean) (JsonPath.read(queryJSON,
 				"$[?(@['METRIC_NAME'] == 'FEE_ONLY')].METRIC_INCLUSION[0]")));
 		if (FEE_ONLY) {
-			filters.add(ff.equal(ff.property("FreeProvis"),
-					ff.literal("Fee only")));
+
+			filters.add(ff.equals(ff.property("Fee_Servic"),ff.literal("Fees Apply")));
+
 		}
 		
 		Boolean AFTER_5_UP_UNTIL_8_PM_ON_WEEKDAYS = ((Boolean) (JsonPath
@@ -204,7 +211,6 @@ public class HealthFilter {
 				
 				List<Filter> weekdayfilter = new ArrayList<Filter>();
 			
-				
 				weekdayfilter.add(ff.and(ff.greater(ff.property("Mo_CL"), ff.literal("2000")), ff.notEqual(ff.property("Mo_CL"), ff.literal("NULL"))));
 				weekdayfilter.add(ff.and(ff.greater(ff.property("Tu_CL"), ff.literal("2000")), ff.notEqual(ff.property("Tu_CL"), ff.literal("NULL"))));
 				weekdayfilter.add(ff.and(ff.greater(ff.property("We_CL"), ff.literal("2000")), ff.notEqual(ff.property("We_CL"), ff.literal("NULL"))));
@@ -226,9 +232,7 @@ public class HealthFilter {
 		if (ANY_SUNDAY_SERVICE) {
 			//filters.add(ff.notEqual(ff.property("Sunday"), ff.literal("None")));
 			
-			filters.add(ff.and(ff.notEqual(ff.property("Sunday"), ff.literal("None")),
-							   ff.notEqual(ff.property("Sunday"), ff.literal("NULL"))));
-			
+			filters.add(ff.and(ff.greater(ff.property("Sunday"),ff.literal("")), ff.and(ff.notEqual(ff.property("Sunday"), ff.literal("None")),ff.notEqual(ff.property("Sunday"), ff.literal("NULL")))));
 			
 		}
 		// Boolean COMMUNITY_HEALTH_CENTRE = ((Boolean) (JsonPath
@@ -237,7 +241,9 @@ public class HealthFilter {
 		// Boolean MENTAL_HEALTH_SERVICE_PROVIDER = ((Boolean) (JsonPath
 		// .read(queryJSON,
 		// "$[?(@['METRIC_NAME'] == 'MENTAL_HEALTH_SERVICE_PROVIDER')].METRIC_INCLUSION[0]")));
+		
 		query.setFilter(ff.and(filters));
+		
 		LOGGER.info("Query: {}", query.toString());
 		SimpleFeatureCollection gpClinics = source.getFeatures(query);
 		LOGGER.info("Found {} gp clinics", gpClinics.size());
