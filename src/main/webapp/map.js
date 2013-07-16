@@ -24,9 +24,9 @@ window['map_init'] = function() {
 			rules : [ new OpenLayers.Rule({
 				symbolizer : {
 					"Point" : {
-						pointRadius : 5,
-						graphicName : "square",
-						fillColor : "white",
+						pointRadius : 6,
+						graphicName : "circle",
+						fillColor : "yellow",
 						fillOpacity : 0.25,
 						strokeWidth : 1,
 						strokeOpacity : 1,
@@ -60,6 +60,18 @@ window['map_init'] = function() {
 		renderers : [ "Canvas", "SVG", "VML" ]
 	});
 
+	lyr_results_gps = new OpenLayers.Layer.Vector("Selected GPs", {
+		projection : mercator,
+		strategies : [ new OpenLayers.Strategy.Fixed() ],
+		styleMap : styles,
+		protocol : new OpenLayers.Protocol.HTTP({
+			url : "/health-demonstrator/service/health-filter/filterResultGP",
+			format : new OpenLayers.Format.GeoJSON()
+		}),
+		renderers : [ "Canvas", "SVG", "VML" ]
+	});
+	lyr_results_gps.setVisibility(false);
+	
 	// define SEIFA layers
 	lyr_SEIFA = new OpenLayers.Layer.WMS("SEIFA",
 			"/health-demonstrator/geoserver/wms", {
@@ -81,7 +93,7 @@ window['map_init'] = function() {
 
 	
 	//define GPs layers
-	lyr_GP = new OpenLayers.Layer.WMS("GP",
+	lyr_GP = new OpenLayers.Layer.WMS("All GPs",
 			"/health-demonstrator/geoserver/wms", {
 				LAYERS : 'CSDILA_local:nwmm_gps',
 				STYLES : '',
@@ -192,7 +204,7 @@ window['map_init'] = function() {
 						})
 			});
 	*/
-	map.addLayers([osm, lyr_results, lyr_SEIFA, lyr_Diabetes, lyr_Depression, lyr_Obesity, lyr_Smoking, lyr_GP]);
+	map.addLayers([osm, lyr_results,lyr_results_gps,lyr_SEIFA, lyr_Diabetes, lyr_Depression, lyr_Obesity, lyr_Smoking, lyr_GP]);
 
 	map.setCenter(new OpenLayers.LonLat(16133371, -4544265), 12);
 

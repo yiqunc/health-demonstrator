@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class HealthFilter {
 
 	static final Logger LOGGER = LoggerFactory.getLogger(HealthFilter.class);
-
+	
 	public SimpleFeatureCollection filter(String queryJSON) throws Exception {
 		LOGGER.info("JSON: {}", queryJSON);
 
@@ -118,6 +118,7 @@ public class HealthFilter {
 					smokingSource, smokingOp, smokingValue, "Smoke18_AS"); //SmokePop
 			layers.add(smokingFeatures);
 		}
+		
 		Boolean NO_ACCESS_TO_GENERAL_PRACTICE = ((Boolean) (JsonPath
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'NO_ACCESS_TO_GENERAL_PRACTICE')].METRIC_INCLUSION[0]")));
@@ -132,6 +133,7 @@ public class HealthFilter {
 					.getFeatureSource();
 			gpBuffers = filterGPAttributes(gpSource, queryJSON);
 		}
+		
 		SimpleFeatureCollection filteredFeatures = null; // = seifaFeatures;
 		for (SimpleFeatureCollection intersectFeatures : layers) {
 			LOGGER.info("Layer size {}", intersectFeatures.size());
@@ -148,15 +150,40 @@ public class HealthFilter {
 			}
 
 		}
-		SimpleFeatureCollection gpExcluded = difference(filteredFeatures,
+		SimpleFeatureCollection gpExcluded = difference2(filteredFeatures,
 				gpBuffers);
-		LOGGER.info("Filtered total features: {}", gpExcluded.size());
+		if (gpExcluded!= null){
+			LOGGER.info("Filtered total features: {}", gpExcluded.size());
+		} else
+		{
+			LOGGER.info("=========== no polygon returns ===========");
+		}
 		return gpExcluded;
 	}
 
+	public SimpleFeatureCollection filterGP(String queryJSON) throws Exception {
+		LOGGER.info("JSON: {}", queryJSON);
+
+		SimpleFeatureSource gp = ((FileDataStore) Config
+				.getDefaultFactory().getDataStore(LayerMapping.GENERAL_PRACTICE_Layer))
+				.getFeatureSource();
+		
+		Boolean NO_ACCESS_TO_GENERAL_PRACTICE = ((Boolean) (JsonPath
+				.read(queryJSON,
+						"$[?(@['METRIC_NAME'] == 'NO_ACCESS_TO_GENERAL_PRACTICE')].METRIC_INCLUSION[0]")));
+		
+		if (NO_ACCESS_TO_GENERAL_PRACTICE) 
+		{
+			return filterGPAttributes(gp, queryJSON);
+		}
+		
+		return gp.getFeatures();
+		
+	}
+	
 	private SimpleFeatureCollection filterGPAttributes(
 			SimpleFeatureSource source, String queryJSON) throws IOException {
-
+		String attrPreFix ="GPs_";
 		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
 		Query query = new Query();
 		List<Filter> filters = new ArrayList<Filter>();
@@ -166,7 +193,13 @@ public class HealthFilter {
 		if (BULK_BILLING_AND_FEE_BASED_SERVICE) {
 			//FreeProvis
 			//Exclude records whose Fee_Servic is NULL, isNull doesn't function properly here
-			filters.add(ff.and(ff.greater(ff.property("Fee_Servic"),ff.literal("")), ff.notEqual(ff.property("Fee_Servic"),ff.literal("Other"))));
+			List<Filter> fltAnd = new ArrayList<Filter>();
+			fltAnd.add(ff.greater(ff.property(attrPreFix+"Fee_Se"), ff.literal("")));
+			fltAnd.add(ff.notEqual(ff.property(attrPreFix+"Fee_Se"), ff.literal("Other")));
+			fltAnd.add(ff.notEqual(ff.property(attrPreFix+"Fee_Se"), ff.literal("No Bulk Bill")));
+			fltAnd.add(ff.notEqual(ff.property(attrPreFix+"Fee_Se"), ff.literal("No Fee")));
+			filters.add(ff.and(fltAnd));
+			
 		}
 		
 		//attention: use ff.equals NOT ff.equal
@@ -174,15 +207,20 @@ public class HealthFilter {
 				.read(queryJSON,
 						"$[?(@['METRIC_NAME'] == 'BULK_BILLING_ONLY')].METRIC_INCLUSION[0]")));
 		if (BULK_BILLING_ONLY) {
-			filters.add(ff.equals(ff.property("Fee_Servic"), ff.literal("Bulkbilling only")));
 			
+			List<Filter> fltOr = new ArrayList<Filter>();
+			fltOr.add(ff.equals(ff.property(attrPreFix+"Fee_Se"), ff.literal("Bulkbilling only")));
+			fltOr.add(ff.equals(ff.property(attrPreFix+"Fee_Se"), ff.literal("Bulk Bill")));
+			fltOr.add(ff.equals(ff.property(attrPreFix+"Fee_Se"), ff.literal("Bulk Billing")));
+			fltOr.add(ff.equals(ff.property(attrPreFix+"Fee_Se"), ff.literal("No Fee")));
+			filters.add(ff.or(fltOr));
 		}
 		
 		Boolean FEE_ONLY = ((Boolean) (JsonPath.read(queryJSON,
 				"$[?(@['METRIC_NAME'] == 'FEE_ONLY')].METRIC_INCLUSION[0]")));
 		if (FEE_ONLY) {
 
-			filters.add(ff.equals(ff.property("Fee_Servic"),ff.literal("Fees Apply")));
+			filters.add(ff.or(ff.equals(ff.property(attrPreFix+"Fee_Se"),ff.literal("Fees Apply")), ff.equals(ff.property(attrPreFix+"Fee_Se"),ff.literal("No Bulk Bill"))));
 
 		}
 		
@@ -194,11 +232,11 @@ public class HealthFilter {
 			
 			List<Filter> weekdayfilter = new ArrayList<Filter>();
 			
-			weekdayfilter.add(ff.and(ff.greater(ff.property("Mo_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Mo_CL"), ff.literal("2000"))));
-			weekdayfilter.add(ff.and(ff.greater(ff.property("Tu_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Tu_CL"), ff.literal("2000"))));
-			weekdayfilter.add(ff.and(ff.greater(ff.property("We_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("We_CL"), ff.literal("2000"))));
-			weekdayfilter.add(ff.and(ff.greater(ff.property("Th_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Th_CL"), ff.literal("2000"))));
-			weekdayfilter.add(ff.and(ff.greater(ff.property("Fr_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property("Fr_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Mo_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property(attrPreFix+"Mo_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Tu_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property(attrPreFix+"Tu_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"We_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property(attrPreFix+"We_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Th_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property(attrPreFix+"Th_CL"), ff.literal("2000"))));
+			weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Fr_CL"), ff.literal("1700")), ff.lessOrEqual(ff.property(attrPreFix+"Fr_CL"), ff.literal("2000"))));
 				
 			filters.add(ff.or(weekdayfilter));
 
@@ -211,11 +249,11 @@ public class HealthFilter {
 				
 				List<Filter> weekdayfilter = new ArrayList<Filter>();
 			
-				weekdayfilter.add(ff.and(ff.greater(ff.property("Mo_CL"), ff.literal("2000")), ff.notEqual(ff.property("Mo_CL"), ff.literal("NULL"))));
-				weekdayfilter.add(ff.and(ff.greater(ff.property("Tu_CL"), ff.literal("2000")), ff.notEqual(ff.property("Tu_CL"), ff.literal("NULL"))));
-				weekdayfilter.add(ff.and(ff.greater(ff.property("We_CL"), ff.literal("2000")), ff.notEqual(ff.property("We_CL"), ff.literal("NULL"))));
-				weekdayfilter.add(ff.and(ff.greater(ff.property("Th_CL"), ff.literal("2000")), ff.notEqual(ff.property("Th_CL"), ff.literal("NULL"))));
-				weekdayfilter.add(ff.and(ff.greater(ff.property("Fr_CL"), ff.literal("2000")), ff.notEqual(ff.property("Fr_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Mo_CL"), ff.literal("2000")), ff.notEqual(ff.property(attrPreFix+"Mo_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Tu_CL"), ff.literal("2000")), ff.notEqual(ff.property(attrPreFix+"Tu_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"We_CL"), ff.literal("2000")), ff.notEqual(ff.property(attrPreFix+"We_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Th_CL"), ff.literal("2000")), ff.notEqual(ff.property(attrPreFix+"Th_CL"), ff.literal("NULL"))));
+				weekdayfilter.add(ff.and(ff.greater(ff.property(attrPreFix+"Fr_CL"), ff.literal("2000")), ff.notEqual(ff.property(attrPreFix+"Fr_CL"), ff.literal("NULL"))));
 
 				filters.add(ff.or(weekdayfilter));
 			}
@@ -223,7 +261,7 @@ public class HealthFilter {
 		Boolean ANY_SATURDAY_SERVICE_AFTER_12_NOON = ((Boolean) (JsonPath.read(queryJSON,
 		 "$[?(@['METRIC_NAME'] == 'ANY_SATURDAY_SERVICE_AFTER_12_NOON')].METRIC_INCLUSION[0]")));
 		if (ANY_SATURDAY_SERVICE_AFTER_12_NOON) {
-				filters.add(ff.and(ff.greater(ff.property("Sa_CL"), ff.literal("1200")), ff.notEqual(ff.property("Sa_CL"), ff.literal("NULL"))));
+				filters.add(ff.and(ff.greater(ff.property(attrPreFix+"Sa_CL"), ff.literal("1200")), ff.notEqual(ff.property(attrPreFix+"Sa_CL"), ff.literal("NULL"))));
 			}
 		
 		Boolean ANY_SUNDAY_SERVICE = ((Boolean) (JsonPath
@@ -232,7 +270,7 @@ public class HealthFilter {
 		if (ANY_SUNDAY_SERVICE) {
 			//filters.add(ff.notEqual(ff.property("Sunday"), ff.literal("None")));
 			
-			filters.add(ff.and(ff.greater(ff.property("Sunday"),ff.literal("")), ff.and(ff.notEqual(ff.property("Sunday"), ff.literal("None")),ff.notEqual(ff.property("Sunday"), ff.literal("NULL")))));
+			filters.add(ff.and(ff.greater(ff.property(attrPreFix+"Sunday"),ff.literal("")), ff.and(ff.notEqual(ff.property(attrPreFix+"Sunday"), ff.literal("None")),ff.notEqual(ff.property(attrPreFix+"Sunday"), ff.literal("NULL")))));
 			
 		}
 		// Boolean COMMUNITY_HEALTH_CENTRE = ((Boolean) (JsonPath
@@ -247,6 +285,7 @@ public class HealthFilter {
 		LOGGER.info("Query: {}", query.toString());
 		SimpleFeatureCollection gpClinics = source.getFeatures(query);
 		LOGGER.info("Found {} gp clinics", gpClinics.size());
+	
 		return gpClinics;
 	}
 
@@ -316,10 +355,14 @@ public class HealthFilter {
 		if (B == null) {
 			return A;
 		}
+		
+		LOGGER.info("GPBuffer polygon number: {}", B.size());
 		SimpleFeatureIterator BFeatures = B.features();
-		List<SimpleFeature> difference = new ArrayList<SimpleFeature>();
+		//List<SimpleFeature> difference = new ArrayList<SimpleFeature>();
+		
 		SimpleFeatureSource ASource = DataUtilities.source(A);
 		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+		
 		Geometry union = null;
 		while (BFeatures.hasNext()) {
 			SimpleFeature featureB = BFeatures.next();
@@ -330,6 +373,7 @@ public class HealthFilter {
 				union = union.union(geometryB);
 			}
 		}
+		
 		BFeatures.close();
 		LOGGER.info("Union area {}", union.getArea());
 		Filter filter = ff.not(ff.intersects(
@@ -338,6 +382,32 @@ public class HealthFilter {
 		// SimpleFeatureCollection i = BSource.getFeatures(filter);
 		// LOGGER.info("found " + i.size());
 		return ASource.getFeatures(filter);
-
+	}
+	
+	private SimpleFeatureCollection difference2(SimpleFeatureCollection A,
+			SimpleFeatureCollection B) throws IOException {
+		
+		if (A == null || A.size() == 0) return null;
+		
+		if (B == null || B.size() == 0) return A;
+		
+		LOGGER.info("GPBuffer polygon number: {}", B.size());
+		SimpleFeatureIterator BFeatures = B.features();
+		//List<SimpleFeature> difference = new ArrayList<SimpleFeature>();
+		
+		SimpleFeatureSource ASource = DataUtilities.source(A);
+		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+		
+		List<Filter> fltOr = new ArrayList<Filter>();
+		while (BFeatures.hasNext()) {
+			SimpleFeature featureB = BFeatures.next();
+			Geometry geometryB = (Geometry) featureB.getDefaultGeometry();
+			fltOr.add(ff.intersects(ff.property(A.getSchema().getGeometryDescriptor().getName()), ff.literal(geometryB)));
+		}
+		Filter filter = ff.not(ff.or(fltOr));
+		BFeatures.close();
+		// SimpleFeatureCollection i = BSource.getFeatures(filter);
+		// LOGGER.info("found " + i.size());
+		return ASource.getFeatures(filter);
 	}
 }

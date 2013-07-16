@@ -50,41 +50,38 @@ public class HealthFilterResource {
       throws Exception {
 
     
-//    request.getSession().setAttribute("uiParameters", uiParameters);
-//    
-//    // LOGGER.info(request.getSession().getAttribute("uiParameters"));
-//    System.out.println("getFilterResult");
-//    Object uiParameteresObj = request.getSession()
-//        .getAttribute("uiParameters");
-//    if (uiParameteresObj == null)
-//      throw new Exception(
-//          "Internal Server Error: UI parameters doesn't exist in session's attribute");
     HealthFilter healthFilter = new HealthFilter();
-
-    // JSONArray jsonArray = new JSONArray();
 
     SimpleFeatureCollection outputfeatures = healthFilter
         .filter(uiParameters.get("params").toString().replace("=",":")); //convert back to json
-    if(outputfeatures.size()>0){
-    CoordinateReferenceSystem fromCRS = outputfeatures.getSchema()
-        .getCoordinateReferenceSystem();
-    CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
-    //File f = new File(request.getSession().getServletContext().getRealPath("/")+"\\"+request.getSession().getAttribute("rdmOutFileName"));
-    //if(f.exists())
-    //{
-    //	f.delete();
-    //}
-    //String rdmOutFileName =java.util.UUID.randomUUID().toString()+"_out.geojson";
-    //request.getSession().setAttribute("rdmOutFileName", rdmOutFileName);
-    //GeoJSONUtility.writeFeatures(reproject(outputfeatures, fromCRS, toCRS),new FileOutputStream(new File(request.getSession().getServletContext().getRealPath("/")+"\\"+rdmOutFileName)));
-
-    // Mod by Benny, skip using temporary file
-    String tmpRltJSONString = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures, fromCRS, toCRS));
-    request.getSession().setAttribute("tmpRltJSONString", tmpRltJSONString);
+    
+    SimpleFeatureCollection outputfeatures_GP = healthFilter
+            .filterGP(uiParameters.get("params").toString().replace("=",":")); //convert back to json
+    
+    if(outputfeatures!=null && outputfeatures.size()>0){
+	    CoordinateReferenceSystem fromCRS = outputfeatures.getSchema()
+	        .getCoordinateReferenceSystem();
+	    CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
+	    // Mod by Benny, skip using temporary file
+	    String tmpRltJSONString = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures, fromCRS, toCRS));
+	    request.getSession().setAttribute("tmpRltJSONString", tmpRltJSONString);
     }
     else
     {
     	 request.getSession().setAttribute("tmpRltJSONString", "");
+    }
+    
+    if(outputfeatures_GP!=null && outputfeatures_GP.size()>0){
+        CoordinateReferenceSystem fromCRS = outputfeatures_GP.getSchema()
+            .getCoordinateReferenceSystem();
+        CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
+        // Mod by Benny, skip using temporary file
+        String tmpRltJSONStringGP = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures_GP, fromCRS, toCRS));
+        request.getSession().setAttribute("tmpRltJSONStringGP", tmpRltJSONStringGP);
+    }
+    else
+    {
+    	 request.getSession().setAttribute("tmpRltJSONStringGP", "");
     }
   }
 
@@ -96,33 +93,18 @@ public class HealthFilterResource {
 	  if(request.getSession().getAttribute("tmpRltJSONString")!=null){
 		  InputStream instream = new ByteArrayInputStream(request.getSession().getAttribute("tmpRltJSONString").toString().getBytes());
 		  StreamUtils.copy(instream, response.getOutputStream());
-	  } else
-	  {
-		  //StreamUtils.copy(null, response.getOutputStream());
-	  }
-	  // Write file contents to output stream...
-
-      //StreamUtils.copy(new FileInputStream(new File(request.getSession().getServletContext().getRealPath("/")+"\\"+request.getSession().getAttribute("rdmOutFileName"))), response.getOutputStream());
-      
-//   // LOGGER.info(request.getSession().getAttribute("uiParameters"));
-//    System.out.println("getFilterResult");
-//    Object uiParameteresObj = request.getSession()
-//        .getAttribute("uiParameters");
-//    if (uiParameteresObj == null)
-//      throw new Exception(
-//          "Internal Server Error: UI parameters doesn't exist in session's attribute");
-//    HealthFilter healthFilter = new HealthFilter();
-//
-//    // JSONArray jsonArray = new JSONArray();
-//
-//    SimpleFeatureCollection outputfeatures = healthFilter
-//        .filter(uiParameteresObj.toString());
-//    CoordinateReferenceSystem fromCRS = outputfeatures.getSchema()
-//        .getCoordinateReferenceSystem();
-//    CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
-//    GeoJSONUtility.writeFeatures(reproject(outputfeatures, fromCRS, toCRS),
-//        response.getOutputStream());
-
+	  } 
+  }
+  
+  @RequestMapping(method = RequestMethod.GET, value = "filterResultGP", produces = "application/json")
+  public void getFilterResultGP(HttpServletRequest request,
+      HttpServletResponse response) throws Exception {
+ 
+	  // Mod by Benny, skip using temporary file
+	  if(request.getSession().getAttribute("tmpRltJSONStringGP")!=null){
+		  InputStream instream = new ByteArrayInputStream(request.getSession().getAttribute("tmpRltJSONStringGP").toString().getBytes());
+		  StreamUtils.copy(instream, response.getOutputStream());
+	  } 
   }
 
   private SimpleFeatureCollection reproject(SimpleFeatureCollection collection,
