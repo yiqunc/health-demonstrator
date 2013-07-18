@@ -4,12 +4,14 @@ org.aurin.demonstratortools.health.mainUI = function() {
 	leftpanel = new Ext.Panel(
 			{
 				title : 'Health Indicators',
-				height : 'auto',
+				height : 330,
+				id : 'extjsLeftpanel',
+				width : Ext.getBody().getViewSize().width / 2,
+				monitorResize: true,
 				frame : true,
-
 				items : new Ext.form.FormPanel(
 						{
-							width : 600,
+							//width : '100%',
 							bodyPadding : 7,
 							defaults : {
 								anchor : '100%',
@@ -20,6 +22,7 @@ org.aurin.demonstratortools.health.mainUI = function() {
 							},
 							layout : {
 								type : 'table',
+								height : 300,
 								columns : 7
 							},
 							frame : false,
@@ -372,8 +375,28 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										xtype : 'label',
 										id : 'slider_maxvalue15',
 										colspan : 1
-									}
+									},
+									{
+										xtype : 'label',
 
+										text : ' ',
+										margins : '0 0 0 10',
+										colspan : 7
+									},
+									{
+										xtype : 'label',
+
+										text : '',
+										margins : '0 0 0 10',
+										colspan : 7
+									},
+									{
+										xtype : 'label',
+
+										text : '',
+										margins : '0 0 0 10',
+										colspan : 7
+									}
 							]
 						})
 			});
@@ -381,12 +404,14 @@ org.aurin.demonstratortools.health.mainUI = function() {
 	rightpanel = new Ext.Panel(
 			{
 				title : 'Health Services',
-				height : 'auto',
-
+				height : 330,
+				id : 'extjsRightpanel',
+				width : Ext.getBody().getViewSize().width / 2,
+				monitorResize: true,
 				frame : true,
 				items : new Ext.form.FormPanel(
 						{
-							width : 600,
+							//width : '100%',
 							bodyPadding : 7,
 							defaults : {
 								anchor : '100%',
@@ -397,6 +422,7 @@ org.aurin.demonstratortools.health.mainUI = function() {
 							},
 							layout : {
 								type : 'table',
+								height : 300,
 								columns : 7
 							},
 							frame : false,
@@ -628,7 +654,22 @@ org.aurin.demonstratortools.health.mainUI = function() {
 										hidden : false,
 										disabled: true
 
-									} ]
+									},
+									{
+										xtype : 'label',
+
+										text : '',
+										margins : '0 0 0 10',
+										colspan : 7
+									},
+									{
+										xtype : 'label',
+
+										text : '',
+										margins : '0 0 0 10',
+										colspan : 7
+									}
+									]
 						})
 			});
 			
@@ -641,7 +682,7 @@ org.aurin.demonstratortools.health.mainUI = function() {
 				title : 'Health Demonstrator Tool',
 				resizable : false,
 				//closable : true,
-				width : 200,
+				width : '100%',
 				//height : 300,
 				align : 'center',
 				minWidth : 400,
@@ -650,10 +691,12 @@ org.aurin.demonstratortools.health.mainUI = function() {
 					type : 'table',
 					columns : 2
 				},
+
 				plain : true,
 				modal : true,
+
+				items : [ leftpanel, rightpanel, window['mapPanel']],
 				
-				items : [ leftpanel, rightpanel, window['mapPanel']  ],
 				buttons : [ {
 					text : 'Run',
 					handler : function(w) {
@@ -848,6 +891,9 @@ org.aurin.demonstratortools.health.mainUI = function() {
 	});
 
 	org.aurin.demonstratortools.health.run = function() {
+		
+		var waitingMsg = Ext.MessageBox.wait('Please wait unill the map is refreshed.','Performing Analysis');
+		
 		var _url2 = generateURL("service/health-filter/runAnalysis");
 		var _UIParams = org.aurin.demonstratortools.health
 				.prepareUIParameteres();
@@ -859,70 +905,22 @@ org.aurin.demonstratortools.health.mainUI = function() {
 			jsonData : {
 				'params' : _encodedUIParams
 			},
-			callback: function() { Ext.getDom('iframe-window').src = Ext.getDom('iframe-window').src }
+			callback: function() { 
+				Ext.getDom('iframe-window').src = Ext.getDom('iframe-window').src;
+				waitingMsg.hide();
+				}
 		});
 		//Ext.getDom('iframe-window').src = Ext.getDom('iframe-window').src
 	}
 
 }
-//
-// x=false
-// if (!x)
-// return;
-// var _UIParams= org.aurin.demonstratortools.health.prepareUIParameteres();
-// var _encodedUIParams = Ext.encode(_UIParams);
-// var _url = generateURL("service/health-filter/runAnalysis");
-// Ext.Ajax.request({
-// url: _url,
-// type: 'json',
-// headers: {
-// 'Content-Type': 'application/json;charset=utf-8'
-// },
-// method : 'post',
-// /*params: {
-// 'UIParams':_encodedUIParams,
-// },
-// jsonData: {'UIParams':_encodedUIParams} ,
-// jsonData: {'UIParams':'aaa'} ,
-// */
-// params: {
-// post: JSON.stringify({
-//					 
-// title: 'ggg'
-//					 
-// })
-// },
-// success:function(data,options){
-// console.log(data)
-//				
-// if (data!= null &&data != undefined){
-// if (data.response!= null &&data.response != undefined){
-// if (data.response.record != null &&data.response.record != undefined){
-// //:todo
-//							
-//							
-// }
-// }
-// }
-//				 
-// },
-// failure:function(response,options){
-// new Ext.Window({
-// minHeight : '600px' ,
-// width: '50%',
-// id: 'messagewindowid',
-// //x: 0,
-// //y: 30,
-// layout: "fit",
-// html:response.responseText
-// }).show();
-// }
-// });
-// }
 
 Ext.onReady(function() {
 	org.aurin.demonstratortools.health.init();
 	org.aurin.demonstratortools.health.mainUI();
 });
 
-
+Ext.EventManager.onWindowResize(function(){
+	Ext.getCmp("extjsLeftpanel").setWidth(Ext.getBody().getViewSize().width/2);
+	Ext.getCmp("extjsRightpanel").setWidth(Ext.getBody().getViewSize().width/2);
+});
