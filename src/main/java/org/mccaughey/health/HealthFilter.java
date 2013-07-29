@@ -143,8 +143,7 @@ public class HealthFilter {
 				LOGGER.info("Filtered features: {}", filteredFeatures.size());
 			} else if ((filteredFeatures != null)) {
 				// && (intersectFeatures.size() > 0)) {
-				filteredFeatures = intersection(filteredFeatures,
-						intersectFeatures);
+				filteredFeatures = intersection2(intersectFeatures,filteredFeatures);
 				LOGGER.info("Filtered/intersected features: {}",
 						filteredFeatures.size());
 			}
@@ -349,6 +348,27 @@ public class HealthFilter {
 		// LOGGER.info("Ding!" + intersectionFeatures.size());
 		return DataUtilities.collection(intersectionFeatures);
 	}
+	
+	private SimpleFeatureCollection intersection2(SimpleFeatureCollection A,
+			SimpleFeatureCollection B) throws IOException {
+		SimpleFeatureIterator AFeatures = A.features();
+		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+		//LOGGER.info("A.size:"+A.size() + " B.size:" + B.size());
+		SimpleFeatureSource BSource = DataUtilities.source(B);
+
+		List<Filter> fltOr = new ArrayList<Filter>();
+		while (AFeatures.hasNext()) {
+			SimpleFeature featureA = AFeatures.next();
+			Geometry geometryA = (Geometry) featureA.getDefaultGeometry();
+			fltOr.add(ff.intersects(ff.property(B.getSchema().getGeometryDescriptor().getName()), ff.literal(geometryA)));
+		}
+		
+		AFeatures.close();
+
+		Filter filter = ff.or(fltOr);
+		return BSource.getFeatures(filter);
+	}
+
 
 	private SimpleFeatureCollection difference(SimpleFeatureCollection A,
 			SimpleFeatureCollection B) throws IOException {
@@ -393,7 +413,6 @@ public class HealthFilter {
 		
 		LOGGER.info("GPBuffer polygon number: {}", B.size());
 		SimpleFeatureIterator BFeatures = B.features();
-		//List<SimpleFeature> difference = new ArrayList<SimpleFeature>();
 		
 		SimpleFeatureSource ASource = DataUtilities.source(A);
 		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
@@ -406,8 +425,6 @@ public class HealthFilter {
 		}
 		Filter filter = ff.not(ff.or(fltOr));
 		BFeatures.close();
-		// SimpleFeatureCollection i = BSource.getFeatures(filter);
-		// LOGGER.info("found " + i.size());
 		return ASource.getFeatures(filter);
 	}
 }
