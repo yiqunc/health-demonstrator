@@ -708,27 +708,51 @@ org.aurin.demonstratortools.health.mainUI = function() {
 			//
 			VIEWPORT = Ext.create('Ext.container.Viewport', {
 			layout: 'border',
-			items: [ org.aurin.demonstratortools.health.mainPanel
-			,
-			{			 	
-				xtype:'panel',
-				region: 'center',
-				 layout : 'fit',
-				items:[
-				{
-					xtype : "component",				 
-					 id    : 'iframe-window',
-					height: 370,
-					autoEl : {
-						tag : "iframe",
-						src : "map.html"
-					
-					}
-				}
-				]	
-			 
-			}
+			items: [ 
+{			 	
+	xtype:'panel',
+	region: 'north',
+	layout : 'fit',
+	border: false,
+    margins: '0 0 0 0',
+	items:[
+	{
+		xtype : "component",				 
+		 id    : 'iframe-header',
+		height: 140,
+		autoScroll:false,
+		autoEl : {
+			tag : "iframe",
+			src : "header.html",
 			
+		}
+	}
+	]	
+ 
+},
+			        org.aurin.demonstratortools.health.mainPanel
+			    
+			        ,
+			        {			 	
+						xtype:'panel',
+						region: 'center',
+						 layout: 'fit',
+						 border: false,
+						margins: '0 0 0 0',
+						items:[
+						{
+							xtype : "component",				 
+							 id    : 'iframe-window',
+							height: 370,
+							autoEl : {
+								tag : "iframe",
+								src : "map.html"
+							
+							}
+						}
+						]	
+					 
+					}
 			
 			 ]
 		});	
