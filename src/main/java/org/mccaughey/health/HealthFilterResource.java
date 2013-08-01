@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,17 +33,22 @@ import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import org.mccaughey.geotools.util.ShapeFile;
+
 @Controller
 @RequestMapping("/health-filter")
 public class HealthFilterResource {
   static final Logger LOGGER = LoggerFactory
       .getLogger(HealthFilterResource.class);
+  
+  private static final String ZIP_FILE_LOCATION_ATTRIBUTE = "Generated_ZipFile_Location";
 
   @RequestMapping(method = RequestMethod.POST, value = "/runAnalysis", consumes = "application/json")
   public void handleFilteringRequest(
@@ -49,40 +56,58 @@ public class HealthFilterResource {
       HttpServletRequest request, HttpServletResponse response)
       throws Exception {
 
-    
-    HealthFilter healthFilter = new HealthFilter();
-
-    SimpleFeatureCollection outputfeatures = healthFilter
-        .filter(uiParameters.get("params").toString().replace("=",":")); //convert back to json
-    
-    SimpleFeatureCollection outputfeatures_GP = healthFilter
-            .filterGP(uiParameters.get("params").toString().replace("=",":")); //convert back to json
-    
-    if(outputfeatures!=null && outputfeatures.size()>0){
-	    CoordinateReferenceSystem fromCRS = outputfeatures.getSchema()
-	        .getCoordinateReferenceSystem();
-	    CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
-	    // Mod by Benny, skip using temporary file
-	    String tmpRltJSONString = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures, fromCRS, toCRS));
-	    request.getSession().setAttribute("tmpRltJSONString", tmpRltJSONString);
-    }
-    else
-    {
-    	 request.getSession().setAttribute("tmpRltJSONString", "");
-    }
-    
-    if(outputfeatures_GP!=null && outputfeatures_GP.size()>0){
-        CoordinateReferenceSystem fromCRS = outputfeatures_GP.getSchema()
-            .getCoordinateReferenceSystem();
-        CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
-        // Mod by Benny, skip using temporary file
-        String tmpRltJSONStringGP = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures_GP, fromCRS, toCRS));
-        request.getSession().setAttribute("tmpRltJSONStringGP", tmpRltJSONStringGP);
-    }
-    else
-    {
-    	 request.getSession().setAttribute("tmpRltJSONStringGP", "");
-    }
+	  synchronized (request.getSession()) {
+		  
+	    HealthFilter healthFilter = new HealthFilter();
+	
+	    SimpleFeatureCollection outputfeatures = healthFilter
+	        .filter(uiParameters.get("params").toString().replace("=",":")); //convert back to json
+	    
+	    SimpleFeatureCollection outputfeatures_GP = healthFilter
+	            .filterGP(uiParameters.get("params").toString().replace("=",":")); //convert back to json
+	    
+	    if(outputfeatures!=null && outputfeatures.size()>0){
+		    CoordinateReferenceSystem fromCRS = outputfeatures.getSchema()
+		        .getCoordinateReferenceSystem();
+		    CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
+		    // Mod by Benny, skip using temporary file
+		    String tmpRltJSONString = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures, fromCRS, toCRS));
+		    request.getSession().setAttribute("tmpRltJSONString", tmpRltJSONString);
+		    request.getSession().setAttribute("tmpRltSize", outputfeatures.size());
+		    
+			File zipfile = ShapeFile.createShapeFileAndReturnAsZipFile(
+					"output.shp", null, outputfeatures, request.getSession());
+			request.getSession().setAttribute(ZIP_FILE_LOCATION_ATTRIBUTE,
+					zipfile.getAbsolutePath());
+			//
+			LOGGER.info("Writing zip to file {}", zipfile.getAbsoluteFile());
+			
+	    }
+	    else
+	    {
+	    	request.getSession().setAttribute(ZIP_FILE_LOCATION_ATTRIBUTE,null);
+	    	request.getSession().setAttribute("tmpRltJSONString", "");
+	    	request.getSession().setAttribute("tmpRltSize", 0);
+	    }
+	    
+	    if(outputfeatures_GP!=null && outputfeatures_GP.size()>0){
+	        CoordinateReferenceSystem fromCRS = outputfeatures_GP.getSchema()
+	            .getCoordinateReferenceSystem();
+	        CoordinateReferenceSystem toCRS = CRS.decode("EPSG:3857");
+	        // Mod by Benny, skip using temporary file
+	        String tmpRltJSONStringGP = GeoJSONUtility.createFeaturesJSONString(reproject(outputfeatures_GP, fromCRS, toCRS));
+	        request.getSession().setAttribute("tmpRltJSONStringGP", tmpRltJSONStringGP);
+	    }
+	    else
+	    {
+	    	 request.getSession().setAttribute("tmpRltJSONStringGP", "");
+	    }
+	    
+	    response.setContentType("text/html");
+		  PrintWriter pw = response.getWriter();
+		  pw.print(request.getSession().getAttribute("tmpRltSize").toString());
+		  pw.close();
+	  }
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "filterResult", produces = "application/json")
@@ -148,5 +173,24 @@ public class HealthFilterResource {
     return featureBuilder.buildFeature(feature.getID());
 
   }
-
+  
+  @RequestMapping(value = "downloadGeneratedOutputAzShpZip", method = RequestMethod.GET)
+	public void downloadGeneratedOutputAzShpZip(HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		synchronized (request.getSession()) {
+			if (request.getSession().getAttribute(ZIP_FILE_LOCATION_ATTRIBUTE) == null) {
+				response.setContentType("text/html");
+				PrintWriter pw = response.getWriter();
+			    pw.println("No Results Generated");
+			    pw.close();
+				return;
+			}
+			File file = new File((String) request.getSession().getAttribute(
+					ZIP_FILE_LOCATION_ATTRIBUTE));
+			response.setContentType("application/x-download");
+			response.setHeader("Content-disposition", "attachment; filename="
+					+ "health_output.zip");
+			FileCopyUtils.copy(new FileInputStream(file),response.getOutputStream());
+		}
+	}
 }

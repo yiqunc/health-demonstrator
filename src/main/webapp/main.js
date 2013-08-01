@@ -677,16 +677,12 @@ org.aurin.demonstratortools.health.mainUI = function() {
 			'Ext.Panel', {
 				region: 'north',
 				collapsible: true,
-			//	id : 'recordWindow',
-				// renderTo: 'maindiv',
 				title : 'Health Demonstrator Tool',
 				resizable : false,
-				//closable : true,
 				width : '100%',
-				//height : 300,
 				align : 'center',
 				minWidth : 400,
-				  //	minHeight: 500,
+
 				layout : {
 					type : 'table',
 					columns : 2
@@ -697,7 +693,14 @@ org.aurin.demonstratortools.health.mainUI = function() {
 
 				items : [ leftpanel, rightpanel, window['mapPanel']],
 				
-				buttons : [ {
+				buttons : [{
+					text : 'Download Result',
+					disabled : true,
+					id : 'bt-download',
+					handler : function(w) {
+						org.aurin.demonstratortools.health.download();
+					}
+				}, {
 					text : 'Run',
 					handler : function(w) {
 						org.aurin.demonstratortools.health.run();
@@ -914,6 +917,10 @@ org.aurin.demonstratortools.health.mainUI = function() {
 		//  org.aurin.demonstratortools.health.mainPanel.show();
 	});
 
+	org.aurin.demonstratortools.health.download = function() {
+		window.open("service/health-filter/downloadGeneratedOutputAzShpZip");
+	};
+	
 	org.aurin.demonstratortools.health.run = function() {
 		
 		var waitingMsg = Ext.MessageBox.wait('Please wait unill the map is refreshed.','Performing Analysis');
@@ -929,12 +936,20 @@ org.aurin.demonstratortools.health.mainUI = function() {
 			jsonData : {
 				'params' : _encodedUIParams
 			},
-			callback: function() { 
+			
+			success: function(response) { 
 				Ext.getDom('iframe-window').src = Ext.getDom('iframe-window').src;
 				waitingMsg.hide();
-				}
+				if(response.responseText == "0"){
+					Ext.getCmp('bt-download').setDisabled(true);
+				} else
+					{
+					Ext.getCmp('bt-download').setDisabled(false);
+					}
+				
+			}
 		});
-		//Ext.getDom('iframe-window').src = Ext.getDom('iframe-window').src
+
 	}
 
 }
